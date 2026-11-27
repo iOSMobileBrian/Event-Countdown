@@ -8,12 +8,14 @@
 import SwiftUI
 
 struct EventRow: View {
-    let event: Event
+    @State var event: Event
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             Text(event.title)
                 .foregroundColor(event.textColor)
-            Text(event.date.relativeFormatter)
+            TimelineView(.periodic(from: .now, by: 1)) { _ in
+                Text(event.date.relativeFormatter)
+            }
         }
     }
 }
