@@ -7,24 +7,20 @@
 
 import SwiftUI
 
-struct MainEventView: View {
-    @State private var isShowingEventForm = false
-    @State private var currentEvent: Event?
+struct EventsView: View {
     @State private var events: [Event] = []
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach(events) { event in
-                    Button {
-                        currentEvent = event
-                        isShowingEventForm = true
+                ForEach(events.sorted()) { event in
+                    NavigationLink {
+                        EventForm(events: $events, eventToEdit: event)
                     } label: {
                         EventRow(event: event)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
                             deleteEvent(event)
@@ -33,15 +29,12 @@ struct MainEventView: View {
                         }
                     }
                 }
-            }
-            .toolbar {
-                Button("Add Event") {
-                    currentEvent = nil
-                    isShowingEventForm = true
+            }.toolbar {
+                NavigationLink {
+                    EventForm(events: $events)
+                } label: {
+                    Label("Add", systemImage: "plus")
                 }
-            }
-            .sheet(isPresented: $isShowingEventForm) {
-                EventForm(events: $events, eventToEdit: currentEvent)
             }
         }
     }
@@ -52,5 +45,5 @@ struct MainEventView: View {
 }
 
 #Preview {
-    MainEventView()
+    EventsView()
 }
