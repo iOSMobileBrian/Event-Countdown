@@ -10,7 +10,6 @@ import SwiftUI
 struct EventForm: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var events: [Event]
-
     @State private var event: Event
 
     init(events: Binding<[Event]>, eventToEdit: Event? = nil) {
@@ -23,23 +22,36 @@ struct EventForm: View {
     }
 
     var body: some View {
-        Form {
-            Section(header: Text("Event Details")) {
-                TextField("Event Title", text: $event.title)
-                DatePicker(selection: $event.date) {
-                    Text("Select the date")
+        NavigationStack {
+            Form {
+                Section(header: Text("Event Details")) {
+                    TextField("Event Title", text: $event.title)
+                    DatePicker(selection: $event.date) {
+                        Text("Select the date")
+                    }
+                    ColorPicker("Select the event color", selection: $event.textColor)
                 }
-                ColorPicker("Select the event color", selection: $event.textColor)
             }
-            Button("Save") {
-                if let index = events.firstIndex(where: { $0.id == event.id }) {
-                    events[index] = event
-                } else {
-                    events.append(event)
+            .toolbar{
+                ToolbarItem(placement: .title) {
+                    Text(event.title.isEmpty ? "Add event": "editing \(event.title)")
                 }
-                dismiss()
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save", systemImage: "checkmark") {
+                       onSave()
+                    }
+                }
             }
         }
+    }
+    
+    private func onSave(){
+        if let index = events.firstIndex(where: { $0.id == event.id }) {
+            events[index] = event
+        } else {
+            events.append(event)
+        }
+        dismiss()
     }
 }
 
